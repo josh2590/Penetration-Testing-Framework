@@ -8,12 +8,12 @@ from prettytable import PrettyTable
 ns_options_list = ['show', 'help', 'start', 'stop']
 ns_help = 'This is a network sniffer tool designed to record the network packets. \n Press \'help\' to get more ' \
           'information about this tool......... \n Use following commands for network sniffing : \n     start : to ' \
-          'start the network sniffing \n    set : to set values of parameters' \
+          'start the network sniffing \n     set : to set values of parameters' \
           '\n     stop : to end the network sniffing \n     show : to display set values of parameters' \
           '\n Use following parameter to pass with \'start\' commands :\n' \
           '     -o <path> : to pass the output path for file\n     -t <seconds>: to stop the sniffing after given time' \
-          '\n     -d : to display the sniffing on console\n     -v : to verbose the logs\n      -i : to pass the ' \
-          'network interface '
+          '\n     -d : to display the sniffing on console\n     -v : to verbose the logs\n     -i : to pass the ' \
+          'network interface \n Use set (o/t/d/v/i) <value> to set the parameters. \n      set d true i eth0'
 
 params = {}
 ns_start_params_list = ['o', 't', 'd', 'v', 'i']
@@ -23,8 +23,8 @@ ns_invalid_path_error = 'Invalid output path !!!! Use \'help\' to get more infor
 ns_invalid_interface_error = 'Invalid interface !!!! Use \'help\' to get more information.'
 
 # Default values for the parameters
-ns_verbose_status = False
-ns_display_status = False
+ns_verbose_status = 'false'
+ns_display_status = 'false'
 ns_stop_status = False
 BUFFER_SIZE = 65565
 file = 'network_data.pcap'
@@ -69,14 +69,14 @@ def set_params(input_str):
         print(ns_invalid_input_error)
 
 
-def ns_input():
+def sniffer():
     default_params()
     input_status = True
     while input_status:
         input_str = input('network-sniffer> ')
         if input_str == 'exit':
             input_status = False
-        elif input_str[0:5] == 'start' and validate_param(input_str):
+        elif input_str[0:5] == 'start' and validate_args_param(input_str):
             start_sniffer()
         elif input_str[0:3] == 'set':
             set_params(input_str)
@@ -107,7 +107,7 @@ def validate_param_type(param, value):
 
 
 # This module will check the validity of entered parameters
-def validate_param(input_str):
+def validate_args_param(input_str):
     global params
     status = True
     input_str = input_str[5:len(input_str)].strip()
@@ -126,32 +126,53 @@ def validate_param(input_str):
     return status
 
 
+def validate_params():
+    validate = True
+    if params['i'] not in netifaces.interfaces():
+        print('Interface is not valid')
+        validate = False
+    if not os.path.exists(params['o']):
+        print('Output path is not exist')
+        validate = False
+    if not int(params['t']):
+        print('Sniffing time is not valid')
+        validate = False
+    if params['v'] not in ('t', 'f', 'true', 'false', '1', '0'):
+        print('Verbose state is not valid')
+        validate = False
+    if params['d'] not in ('t', 'f', 'true', 'false', '1', '0'):
+        print('Display state is not valid')
+        validate = False
+    return validate
+
+
 # Define a function for the thread for network sniffing
 def network_sniff():
     current_time = time.time()
-    print("Starting Network Sniffing.....")
-    for plen, t, buf in sniff(interface, count=-1, promisc=1, out_file=output_path + file):
-        if ns_display_status in ('t', 'True', '1'):
+    if params['v'] in ('t', 'True', '1'):
+        print("Starting Network Sniffing.....")
+    for plen, t, buf in sniff(params['i'], count=-1, promisc=1, out_file=params['o'] + file):
+        if params['d'] in ('t', 'True', '1'):
             print(buf)
-        if time.time() > current_time + time_duration or ns_stop_status:
-            print("Network Sniffing completed....")
+        if time.time() > current_time + params['t'] or ns_stop_status:
+            if params['v'] in ('t', 'True', '1'):
+                print("Network Sniffing completed....")
             break
 
 
 # Define a function for  network sniffing
 def start_sniffer():
-    try:
-        # lock = threading.Lock();
-        x = threading.Thread(target=network_sniff, args=())
-        x.start()
-    except:
-        print('Network Sniffing Failed')
+    if validate_params():
+        try:
+            # lock = threading.Lock();
+            x = threading.Thread(target=network_sniff, args=(), daemon=True)
+            x.start()
+            print("network-sniffer>")
+        except:
+            print('Network Sniffing Failed')
 
 
 # Define a function to stop network sniffing
 def stop_sniffer():
     global ns_stop_status
     ns_stop_status = True
-
-
-ns_input()
