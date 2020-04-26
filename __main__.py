@@ -1,5 +1,6 @@
 from prettytable import PrettyTable
-from modules import networkSniffer, nmapServices
+from modules import networkSniffer, nmapServices, runningService
+
 print("<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>")
 print("<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>")
 print("<<<< Penetration Testing Tools >>>>")
@@ -13,9 +14,9 @@ display_menu.add_row(['3.', 'IP/Port Scanner'])
 display_menu.add_row(['4.', 'Password Cracker'])
 display_menu.add_row(['5.', 'Vulnerability Scanner'])
 display_menu.add_row(['6.', 'OSINT'])
-print('NOTE : Option 3/4/5/6 are currently not available.')
+print('NOTE : Option 4/5/6 are currently not available.')
 print('')
-print('Enter your choice (1/2/3/4)...Press \'exit\' to close')
+print('Enter your choice (1/2/3/4/5/6)...Press \'exit\' to close')
 print(display_menu)
 
 input_status = True
@@ -26,9 +27,9 @@ while input_status:
     elif input_str == '1':
         networkSniffer.sniffer()
     elif input_str == '2':
-        nmapServices.scan_running_service()
+        runningService.scan()
     elif input_str == '3':
-        print('Sorry! Option not available')
+        nmapServices.scan()
     elif input_str == '4':
         print('Sorry! Option not available')
     elif input_str == '5':
