@@ -1,5 +1,5 @@
 from prettytable import PrettyTable
-from modules import networkSniffer, nmapServices, runningService, johnServices
+from modules import networkSniffer, nmapServices, runningService, johnServices, vulnerabilityScan
 
 print("<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>")
 print("<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>")
@@ -14,7 +14,7 @@ display_menu.add_row(['3.', 'IP/Port Scanner'])
 display_menu.add_row(['4.', 'Password Cracker'])
 display_menu.add_row(['5.', 'Vulnerability Scanner'])
 display_menu.add_row(['6.', 'OSINT'])
-print('NOTE : Option 5/6 are currently not available.')
+print('NOTE : Option 6 is currently not available.')
 print('')
 print('Enter your choice (1/2/3/4/5/6)...Press \'exit\' to close')
 print(display_menu)
@@ -33,7 +33,7 @@ while input_status:
     elif input_str == '4':
         johnServices.passwordCrack()
     elif input_str == '5':
-        print('Sorry! Option not available')
+        vulnerabilityScan.scan()
     elif input_str == '6':
         print('Sorry! Option not available')
     elif input_str != '':
